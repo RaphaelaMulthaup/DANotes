@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "danotes-deb1f": {
+      "hosting": {
+        "danotes": [
+          "danotes-deb1f"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "danotes-deb1f"
+  }
+}
