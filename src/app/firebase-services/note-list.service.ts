@@ -7,6 +7,8 @@ import {
   onSnapshot,
   addDoc,
   updateDoc,
+  deleteDoc,
+  CollectionReference
 } from '@angular/fire/firestore';
 import { Note } from '../interfaces/note.interface';
 
@@ -27,6 +29,12 @@ export class NoteListService {
     this.unsubTrash = this.subTrashList();
   }
 
+  async deleteNote(colId: 'notes' | 'trash', docId: string) {
+    await deleteDoc(this.getSingleDocRef(colId, docId)).catch((err) => {
+      console.log(err);
+    });
+  }
+
   async updateNote(note: Note) {
     if (note.id) {
       let docRef = this.getSingleDocRef(this.getColIdFromNote(note), note.id);
@@ -42,7 +50,7 @@ export class NoteListService {
       title: note.title,
       content: note.content,
       marked: note.marked,
-    }
+    };
   }
 
   getColIdFromNote(note: Note) {
@@ -53,8 +61,8 @@ export class NoteListService {
     }
   }
 
-  async addNote(item: Note) {
-    await addDoc(this.getNotesRef(), item)
+  async addNote(item: Note, colId: 'notes' | 'trash') {
+    await addDoc(this.getRef(colId), item)
       .catch((err) => {
         console.error(err);
       })
@@ -86,6 +94,10 @@ export class NoteListService {
       });
       console.log(this.normalNotes);
     });
+  }
+
+  getRef(colId: 'notes' | 'trash'): CollectionReference<Note> {
+    return collection(this.firestore, colId) as CollectionReference<Note>;
   }
 
   getNotesRef() {

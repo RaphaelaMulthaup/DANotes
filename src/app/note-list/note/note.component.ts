@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { Note } from '../../interfaces/note.interface';
-import { NoteListService } from '../../firebase-services/note-list.service'
+import { NoteListService } from '../../firebase-services/note-list.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -9,48 +9,61 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [FormsModule, CommonModule],
   templateUrl: './note.component.html',
-  styleUrl: './note.component.scss'
+  styleUrl: './note.component.scss',
 })
 export class NoteComponent {
-  @Input() note!:Note;
+  @Input() note!: Note;
   edit = false;
   hovered = false;
-  
-  constructor(private noteService: NoteListService){}
 
-  changeMarkedStatus(){
+  constructor(private noteService: NoteListService) {}
+
+  changeMarkedStatus() {
     this.note.marked = !this.note.marked;
     this.saveNote();
   }
 
-  deleteHovered(){
-    if(!this.edit){
+  deleteHovered() {
+    if (!this.edit) {
       this.hovered = false;
     }
   }
 
-  openEdit(){
+  openEdit() {
     this.edit = true;
   }
 
-  closeEdit(){
+  closeEdit() {
     this.edit = false;
     this.saveNote();
   }
 
-  moveToTrash(){
-    this.note.type = 'trash';
+  moveToTrash() {
+    if (this.note.id) {
+      this.note.type = 'trash';
+      let docId = this.note.id;
+      delete this.note.id;
+      this.noteService.addNote(this.note, 'trash');
+      this.noteService.deleteNote('notes', docId);
+    }
   }
 
-  moveToNotes(){
-    this.note.type = 'note';
+  moveToNotes() {
+    let docId = this.note.id;
+    if (docId) {
+      this.note.type = 'note';
+      this.noteService.addNote(this.note, 'notes');
+      this.noteService.deleteNote('trash', docId);
+    }
   }
 
-  deleteNote(){
-
+  deleteNote() {
+    if (this.note.id) {
+      this.noteService.deleteNote('trash', this.note.id);
+    }
   }
 
-  saveNote(){
+  saveNote() {
     this.noteService.updateNote(this.note);
   }
 }
