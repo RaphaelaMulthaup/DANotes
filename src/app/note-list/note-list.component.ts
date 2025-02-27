@@ -20,12 +20,18 @@ export class NoteListComponent {
   constructor(private noteService: NoteListService) {}
 
   getList(type: 'normal' | 'trash'): Note[] {
-    return type === 'normal' ? this.noteService.normalNotes : this.noteService.trashNotes;
+    return type === 'normal'
+      ? this.noteService.normalNotes
+      : this.noteService.trashNotes;
   }
-  
-  
+
   changeFavFilter(filter: 'all' | 'fav') {
     this.favFilter = filter;
+    if (filter == 'all') {
+      this.noteService.subNotesList();
+    } else {
+      this.noteService.subNotesMarkedList();
+    }
   }
 
   changeTrashStatus() {
